@@ -1,0 +1,588 @@
+import 'package:equatable/equatable.dart';
+import 'package:json_annotation/json_annotation.dart';
+import '../../core/services/api/converters.dart';
+import external_link.dart;
+import card_hint.dart;
+import cover_image.dart;
+
+part 'card.g.dart';
+
+@JsonSerializable(
+  fieldRename: FieldRename.snake,
+  explicitToJson: true,
+  includeIfNull: false,
+)
+class Card extends Equatable {
+  @SafeStringConverter()
+  final String id;
+  @SafeStringConverter()
+  final String title;
+  @SafeStringConverter()
+  final String? description;
+  @SafeStringConverter()
+  final String boardId;
+  @SafeStringConverter()
+  final String? boardTitle;
+  @SafeStringConverter()
+  final String? listId;
+  @SafeStringConverter()
+  final String? listTitle;
+  @SafeStringConverter()
+  final String? listColor;
+  @SafeStringConverter()
+  final String? teamId;
+  @SafeStringConverter()
+  final String? projectId;
+  @SafeStringConverter()
+  @JsonKey(name: 'user_id')
+  final String? userId;
+  @SafeStringConverter()
+  @JsonKey(name: 'assigned_to')
+  final String? assignedTo;
+  @SafeStringConverter()
+  final String? assignedToName;
+  @SafeStringListConverter()
+  final List<String>? tags;
+  @SafeStringConverter()
+  final String? status;
+  @SafeIntConverter()
+  final int? position;
+  @SafeStringConverter()
+  final String? coverImageUrl;
+  final List<Comment>? comments;
+  final List<Attachment>? attachments;
+  @SafeStringListConverter()
+  @JsonKey(name: 'child_card_order')
+  final List<String>? childCardIds;
+  @SafeStringListConverter()
+  @JsonKey(name: 'linked_card_order') // Looked at log: it was child_card_order, linked_cards was empty list, maybe linked_card_order?
+  final List<String>? linkedCardIds;
+  @SafeStringConverter()
+  @JsonKey(name: 'parent_card_id')
+  final String? parentCardId;
+  final List<ChecklistItem>? checklistItems;
+  @SafeIntConverter()
+  @JsonKey(name: 'total_comments')
+  final int? totalComments;
+  @TimestampConverter()
+  final DateTime? dueDate;
+  final bool isArchived;
+  @JsonKey(name: 'time_created')
+  @TimestampConverter()
+  final DateTime createdAt;
+  @JsonKey(name: 'time_updated')
+  @TimestampConverter()
+  final DateTime? updatedAt;
+  final List<ExternalLink>? externalLinks;
+  final List<CardHint>? hints;
+  final CoverImage? coverImage;
+  @SafeIntConverter()
+  final int? estimate;
+  @SafeStringConverter()
+  @JsonKey(name: 'copied_from_card_id')
+  final String? copiedFromCardId;
+  final Map<String, dynamic>? metadata;
+
+  const Card({
+    required this.id,
+    required this.title,
+    this.description,
+    required this.boardId,
+    this.boardTitle,
+    this.listId,
+    this.listTitle,
+    this.listColor,
+    this.teamId,
+    this.projectId,
+    this.userId,
+    this.assignedTo,
+    this.assignedToName,
+    this.tags,
+    this.status,
+    this.position,
+    this.coverImageUrl,
+    this.comments,
+    this.attachments,
+    this.childCardIds,
+    this.linkedCardIds,
+    this.parentCardId,
+    this.checklistItems,
+    this.totalComments,
+    this.dueDate,
+    this.isArchived = false,
+    required this.createdAt,
+    this.updatedAt,
+    this.metadata,
+  });
+
+  factory Card.fromJson(Map<String, dynamic> json) {
+    final converter = const SafeStringConverter();
+    return Card(
+      id: converter.fromJson(json['id']) ?? '',
+      title: converter.fromJson(json['title']) ?? '',
+      description: converter.fromJson(json['description']),
+      boardId: converter.fromJson(json['board_id']) ?? '',
+      boardTitle: converter.fromJson(json['board_title']),
+      listId: converter.fromJson(json['list_id']),
+      listTitle: converter.fromJson(json['list_title']),
+      listColor: converter.fromJson(json['list_color']),
+      teamId: converter.fromJson(json['team_id']),
+      projectId: converter.fromJson(json['project_id']),
+      userId: converter.fromJson(json['user_id']),
+      assignedTo: converter.fromJson(json['assigned_to']),
+      assignedToName: converter.fromJson(json['assigned_to_name']),
+      tags: const SafeStringListConverter().fromJson(json['tags']),
+      status: converter.fromJson(json['status']),
+      position: const SafeIntConverter().fromJson(json['position']),
+      coverImageUrl: converter.fromJson(json['cover_image_url']),
+      comments: (json['comments'] as List<dynamic>?)
+          ?.map((e) => Comment.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      attachments: (json['attachments'] as List<dynamic>?)
+          ?.map((e) => Attachment.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      childCardIds: const SafeStringListConverter().fromJson(json['child_card_order']),
+      linkedCardIds: const SafeStringListConverter().fromJson(json['linked_card_order']),
+      parentCardId: converter.fromJson(json['parent_card_id']),
+      checklistItems: (json['checklist_items'] as List<dynamic>?)
+          ?.map((e) => ChecklistItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      totalComments: const SafeIntConverter().fromJson(json['total_comments']),
+      dueDate: const TimestampConverter().fromJson(json['due_date']),
+      isArchived: json['is_archived'] as bool? ?? false,
+      createdAt: const TimestampConverter().fromJson(json['time_created']) ?? DateTime.now(),
+      updatedAt: const TimestampConverter().fromJson(json['time_updated']),
+      metadata: (json['metadata'] is Map) ? Map<String, dynamic>.from(json['metadata'] as Map) : null,
+    );
+  }
+  Map<String, dynamic> toJson() => _$CardToJson(this);
+
+  Card copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? boardId,
+    String? boardTitle,
+    String? listId,
+    String? listTitle,
+    String? listColor,
+    String? teamId,
+    String? projectId,
+    String? userId,
+    String? assignedTo,
+    String? assignedToName,
+    List<String>? tags,
+    String? status,
+    int? position,
+    String? coverImageUrl,
+    List<Comment>? comments,
+    List<Attachment>? attachments,
+    List<String>? childCardIds,
+    List<String>? linkedCardIds,
+    String? parentCardId,
+    List<ChecklistItem>? checklistItems,
+    int? totalComments,
+    DateTime? dueDate,
+    bool? isArchived,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Map<String, dynamic>? metadata,
+  }) {
+    return Card(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      boardId: boardId ?? this.boardId,
+      boardTitle: boardTitle ?? this.boardTitle,
+      listId: listId ?? this.listId,
+      listTitle: listTitle ?? this.listTitle,
+      listColor: listColor ?? this.listColor,
+      teamId: teamId ?? this.teamId,
+      projectId: projectId ?? this.projectId,
+      userId: userId ?? this.userId,
+      assignedTo: assignedTo ?? this.assignedTo,
+      assignedToName: assignedToName ?? this.assignedToName,
+      tags: tags ?? this.tags,
+      status: status ?? this.status,
+      position: position ?? this.position,
+      coverImageUrl: coverImageUrl ?? this.coverImageUrl,
+      comments: comments ?? this.comments,
+      attachments: attachments ?? this.attachments,
+      childCardIds: childCardIds ?? this.childCardIds,
+      linkedCardIds: linkedCardIds ?? this.linkedCardIds,
+      parentCardId: parentCardId ?? this.parentCardId,
+      checklistItems: checklistItems ?? this.checklistItems,
+      totalComments: totalComments ?? this.totalComments,
+      dueDate: dueDate ?? this.dueDate,
+      isArchived: isArchived ?? this.isArchived,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      metadata: metadata ?? this.metadata,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    id,
+    title,
+    description,
+    boardId,
+    boardTitle,
+    listId,
+    listTitle,
+    listColor,
+    teamId,
+    projectId,
+    userId,
+    assignedTo,
+    assignedToName,
+    tags,
+    status,
+    position,
+    coverImageUrl,
+    comments,
+    attachments,
+    childCardIds,
+    linkedCardIds,
+    parentCardId,
+    checklistItems,
+    totalComments,
+    dueDate,
+    isArchived,
+    createdAt,
+    updatedAt,
+    metadata,
+  ];
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is Card &&
+              runtimeType == other.runtimeType &&
+              id == other.id &&
+              title == other.title;
+
+  @override
+  int get hashCode => id.hashCode ^ title.hashCode;
+}
+
+@JsonSerializable(
+  fieldRename: FieldRename.snake,
+  explicitToJson: true,
+  includeIfNull: false,
+)
+class Comment extends Equatable {
+  @SafeStringConverter()
+  final String id;
+  @SafeStringConverter()
+  final String cardId;
+  @SafeStringConverter()
+  final String content;
+  @SafeStringConverter()
+  final String authorId;
+  @SafeStringConverter()
+  final String authorName;
+  @SafeStringConverter()
+  final String? authorAvatar;
+  @JsonKey(name: 'time_created')
+  @TimestampConverter()
+  final DateTime createdAt;
+  @JsonKey(name: 'time_updated')
+  @TimestampConverter()
+  final DateTime? updatedAt;
+  @SafeStringConverter()
+  final String? parentCommentId;
+  final List<Comment>? replies;
+  final Map<String, int>? reactions;
+  final int? likeCount;
+  final bool? likedByMe;
+
+  const Comment({
+    required this.id,
+    required this.cardId,
+    required this.content,
+    required this.authorId,
+    required this.authorName,
+    this.authorAvatar,
+    required this.createdAt,
+    this.updatedAt,
+    this.parentCommentId,
+    this.replies,
+    this.reactions,
+    this.likeCount,
+    this.likedByMe,
+  });
+
+  Comment copyWith({
+    String? id,
+    String? cardId,
+    String? content,
+    String? authorId,
+    String? authorName,
+    String? authorAvatar,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? parentCommentId,
+    List<Comment>? replies,
+    Map<String, int>? reactions,
+    int? likeCount,
+    bool? likedByMe,
+  }) {
+    return Comment(
+      id: id ?? this.id,
+      cardId: cardId ?? this.cardId,
+      content: content ?? this.content,
+      authorId: authorId ?? this.authorId,
+      authorName: authorName ?? this.authorName,
+      authorAvatar: authorAvatar ?? this.authorAvatar,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      parentCommentId: parentCommentId ?? this.parentCommentId,
+      replies: replies ?? this.replies,
+      reactions: reactions ?? this.reactions,
+      likeCount: likeCount ?? this.likeCount,
+      likedByMe: likedByMe ?? this.likedByMe,
+    );
+  }
+
+  factory Comment.fromJson(Map<String, dynamic> json) {
+    final converter = const SafeStringConverter();
+
+    // Try to extract author name from various possible fields in the API response
+    String extractAuthorName() {
+      // Try direct fields first
+      if (json['author_name'] != null && json['author_name'].toString().isNotEmpty) {
+        return converter.fromJson(json['author_name']) ?? '';
+      }
+      if (json['display_name'] != null && json['display_name'].toString().isNotEmpty) {
+        return converter.fromJson(json['display_name']) ?? '';
+      }
+
+      // Try nested author object
+      if (json['author'] is Map) {
+        final author = json['author'] as Map;
+        if (author['display_name'] != null && author['display_name'].toString().isNotEmpty) {
+          return converter.fromJson(author['display_name']) ?? '';
+        }
+        if (author['name'] != null && author['name'].toString().isNotEmpty) {
+          return converter.fromJson(author['name']) ?? '';
+        }
+        if (author['username'] != null && author['username'].toString().isNotEmpty) {
+          return converter.fromJson(author['username']) ?? '';
+        }
+      }
+
+      // Try nested user object
+      if (json['user'] is Map) {
+        final user = json['user'] as Map;
+        if (user['display_name'] != null && user['display_name'].toString().isNotEmpty) {
+          return converter.fromJson(user['display_name']) ?? '';
+        }
+        if (user['name'] != null && user['name'].toString().isNotEmpty) {
+          return converter.fromJson(user['name']) ?? '';
+        }
+        if (user['username'] != null && user['username'].toString().isNotEmpty) {
+          return converter.fromJson(user['username']) ?? '';
+        }
+      }
+
+      // Fallback to user_id (API uses user_id, not author_id)
+      final userId = json['user_id'] ?? json['author_id'];
+      if (userId != null && userId.toString().isNotEmpty) {
+        final userIdStr = userId.toString();
+        // Return a shortened version of the ID as a last resort
+        return 'User ${userIdStr.length > 8 ? userIdStr.substring(0, 8) : userIdStr}';
+      }
+
+      return 'Anonymous';
+    }
+
+    return Comment(
+      id: converter.fromJson(json['id']) ?? '',
+      cardId: converter.fromJson(json['card_id']) ?? '',
+      content: converter.fromJson(json['content']) ?? '',
+      // API uses user_id, not author_id
+      authorId: converter.fromJson(json['user_id'] ?? json['author_id']) ?? '',
+      authorName: extractAuthorName(),
+      authorAvatar: converter.fromJson(json['author_avatar'] ??
+          (json['author'] is Map ? json['author']['avatar'] : null) ??
+          (json['user'] is Map ? json['user']['avatar'] : null)),
+      createdAt: const TimestampConverter().fromJson(json['time_created']) ?? DateTime.now(),
+      updatedAt: const TimestampConverter().fromJson(json['time_updated']),
+      // API uses parent_id, not parent_comment_id
+      parentCommentId: converter.fromJson(json['parent_id'] ?? json['parent_comment_id']),
+      replies: (json['replies'] as List<dynamic>?)
+          ?.where((e) => e is Map)
+          .map((e) => Comment.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+          ((json['children'] is Map &&
+              json['children']['child_comments'] is List)
+              ? (json['children']['child_comments'] as List<dynamic>)
+              .where((e) => e is Map)
+              .map((e) => Comment.fromJson(e as Map<String, dynamic>))
+              .toList()
+              : null),
+      reactions: (json['reactions'] is Map)
+          ? (json['reactions'] as Map).map(
+            (k, e) => MapEntry(k.toString(), (e as num?)?.toInt() ?? 0),
+      )
+          : null,
+      likeCount: (json['like_count'] as num?)?.toInt(),
+      likedByMe: json['liked_by_me'] as bool?,
+    );
+  }
+  Map<String, dynamic> toJson() => _$CommentToJson(this);
+
+  @override
+  List<Object?> get props => [
+    id,
+    cardId,
+    content,
+    authorId,
+    authorName,
+    authorAvatar,
+    createdAt,
+    updatedAt,
+    parentCommentId,
+    replies,
+    reactions,
+    likeCount,
+    likedByMe,
+  ];
+}
+
+@JsonSerializable(
+  fieldRename: FieldRename.snake,
+  explicitToJson: true,
+  includeIfNull: false,
+)
+class Attachment extends Equatable {
+  @SafeStringConverter()
+  final String id;
+  @SafeStringConverter()
+  final String cardId;
+  @SafeStringConverter()
+  final String fileName;
+  @SafeStringConverter()
+  final String fileUrl;
+  @SafeStringConverter()
+  final String? mimeType;
+  @SafeIntConverter()
+  final int? fileSize;
+  @JsonKey(name: 'time_created')
+  @TimestampConverter()
+  final DateTime createdAt;
+
+  const Attachment({
+    required this.id,
+    required this.cardId,
+    required this.fileName,
+    required this.fileUrl,
+    this.mimeType,
+    this.fileSize,
+    required this.createdAt,
+  });
+
+  factory Attachment.fromJson(Map<String, dynamic> json) {
+    final converter = const SafeStringConverter();
+    return Attachment(
+      id: converter.fromJson(json['id']) ?? '',
+      cardId: converter.fromJson(json['card_id']) ?? '',
+      fileName: converter.fromJson(json['file_name']) ?? '',
+      fileUrl: converter.fromJson(json['file_url']) ?? '',
+      mimeType: converter.fromJson(json['mime_type']),
+      fileSize: const SafeIntConverter().fromJson(json['file_size']),
+      createdAt: const TimestampConverter().fromJson(json['time_created']) ?? DateTime.now(),
+    );
+  }
+  Map<String, dynamic> toJson() => _$AttachmentToJson(this);
+
+  @override
+  List<Object?> get props => [
+    id,
+    cardId,
+    fileName,
+    fileUrl,
+    mimeType,
+    fileSize,
+    createdAt,
+  ];
+}
+
+@JsonSerializable(
+  fieldRename: FieldRename.snake,
+  explicitToJson: true,
+  includeIfNull: false,
+)
+class ChecklistItem extends Equatable {
+  @SafeStringConverter()
+  final String id;
+  @SafeStringConverter()
+  final String cardId;
+  @SafeStringConverter()
+  final String text;
+  final bool isCompleted;
+  @SafeIntConverter()
+  final int? position;
+  @JsonKey(name: 'time_created')
+  @TimestampConverter()
+  final DateTime createdAt;
+  @JsonKey(name: 'time_updated')
+  @TimestampConverter()
+  final DateTime? updatedAt;
+
+  const ChecklistItem({
+    required this.id,
+    required this.cardId,
+    required this.text,
+    this.isCompleted = false,
+    this.position,
+    required this.createdAt,
+    this.updatedAt,
+  });
+
+  factory ChecklistItem.fromJson(Map<String, dynamic> json) {
+    final converter = const SafeStringConverter();
+    return ChecklistItem(
+      id: converter.fromJson(json['id']) ?? '',
+      cardId: converter.fromJson(json['card_id']) ?? '',
+      text: converter.fromJson(json['text']) ?? '',
+      isCompleted: json['is_completed'] as bool? ?? false,
+      position: const SafeIntConverter().fromJson(json['position']),
+      createdAt: const TimestampConverter().fromJson(json['time_created']) ?? DateTime.now(),
+      updatedAt: const TimestampConverter().fromJson(json['time_updated']),
+    );
+  }
+  Map<String, dynamic> toJson() => _$ChecklistItemToJson(this);
+
+  ChecklistItem copyWith({
+    String? id,
+    String? cardId,
+    String? text,
+    bool? isCompleted,
+    int? position,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return ChecklistItem(
+      id: id ?? this.id,
+      cardId: cardId ?? this.cardId,
+      text: text ?? this.text,
+      isCompleted: isCompleted ?? this.isCompleted,
+      position: position ?? this.position,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    id,
+    cardId,
+    text,
+    isCompleted,
+    position,
+    createdAt,
+    updatedAt,
+  ];
+}
