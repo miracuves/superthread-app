@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSy00000000000000000000000000000</string>
+	<key>GCM_SENDER_ID</key>
+	<string>000000000000</string>
+	<key>PROJECT_ID</key>
+	<string>superthread-app</string>
+	<key>STORAGE_BUCKET</key>
+	<string>superthread-app.appspot.com</string>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:000000000000:android:00000000000000000000</string>
+	<key>DATABASE_URL</key>
+	<string>https://superthread-app-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>
