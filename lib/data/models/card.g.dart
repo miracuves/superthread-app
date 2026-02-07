@@ -44,6 +44,18 @@ Card _$CardFromJson(Map<String, dynamic> json) => Card(
       totalComments: const SafeIntConverter().fromJson(json['total_comments']),
       dueDate: const TimestampConverter().fromJson(json['due_date']),
       isArchived: json['is_archived'] as bool? ?? false,
+      externalLinks: (json['external_links'] as List<dynamic>?)
+          ?.map((e) => ExternalLink.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      hints: (json['hints'] as List<dynamic>?)
+          ?.map((e) => CardHint.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      coverImage: json['cover_image'] == null
+          ? null
+          : CoverImage.fromJson(json['cover_image'] as Map<String, dynamic>),
+      estimate: const SafeIntConverter().fromJson(json['estimate']),
+      copiedFromCardId:
+          const SafeStringConverter().fromJson(json['copied_from_card_id']),
       createdAt: DateTime.parse(json['time_created'] as String),
       updatedAt: const TimestampConverter().fromJson(json['time_updated']),
       metadata: json['metadata'] as Map<String, dynamic>?,
@@ -99,6 +111,13 @@ Map<String, dynamic> _$CardToJson(Card instance) {
       const SafeIntConverter().toJson(instance.totalComments));
   writeNotNull('due_date', const TimestampConverter().toJson(instance.dueDate));
   val['is_archived'] = instance.isArchived;
+  writeNotNull('external_links',
+      instance.externalLinks?.map((e) => e.toJson()).toList());
+  writeNotNull('hints', instance.hints?.map((e) => e.toJson()).toList());
+  writeNotNull('cover_image', instance.coverImage?.toJson());
+  writeNotNull('estimate', const SafeIntConverter().toJson(instance.estimate));
+  writeNotNull('copied_from_card_id',
+      const SafeStringConverter().toJson(instance.copiedFromCardId));
   val['time_created'] = instance.createdAt.toIso8601String();
   writeNotNull(
       'time_updated', const TimestampConverter().toJson(instance.updatedAt));

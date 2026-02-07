@@ -1,9 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../../core/services/api/converters.dart';
-import 'external_link.dart';
-import 'card_hint.dart';
-import 'cover_image.dart';
 
 part 'card.g.dart';
 
@@ -55,7 +52,7 @@ class Card extends Equatable {
   @JsonKey(name: 'child_card_order')
   final List<String>? childCardIds;
   @SafeStringListConverter()
-  @JsonKey(name: 'linked_card_order')
+  @JsonKey(name: 'linked_card_order') // Looked at log: it was child_card_order, linked_cards was empty list, maybe linked_card_order?
   final List<String>? linkedCardIds;
   @SafeStringConverter()
   @JsonKey(name: 'parent_card_id')
@@ -67,17 +64,6 @@ class Card extends Equatable {
   @TimestampConverter()
   final DateTime? dueDate;
   final bool isArchived;
-  
-  // NEW FIELDS FROM API
-  final List<ExternalLink>? externalLinks;
-  final List<CardHint>? hints;
-  final CoverImage? coverImage;
-  @SafeIntConverter()
-  final int? estimate;
-  @SafeStringConverter()
-  @JsonKey(name: 'copied_from_card_id')
-  final String? copiedFromCardId;
-  
   @JsonKey(name: 'time_created')
   @TimestampConverter()
   final DateTime createdAt;
@@ -113,11 +99,6 @@ class Card extends Equatable {
     this.totalComments,
     this.dueDate,
     this.isArchived = false,
-    this.externalLinks,
-    this.hints,
-    this.coverImage,
-    this.estimate,
-    this.copiedFromCardId,
     required this.createdAt,
     this.updatedAt,
     this.metadata,
@@ -158,18 +139,6 @@ class Card extends Equatable {
       totalComments: const SafeIntConverter().fromJson(json['total_comments']),
       dueDate: const TimestampConverter().fromJson(json['due_date']),
       isArchived: json['is_archived'] as bool? ?? false,
-      // NEW FIELDS PARSING
-      externalLinks: (json['external_links'] as List<dynamic>?)
-          ?.map((e) => ExternalLink.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      hints: (json['hints'] as List<dynamic>?)
-          ?.map((e) => CardHint.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      coverImage: json['cover_image'] == null
-          ? null
-          : CoverImage.fromJson(json['cover_image'] as Map<String, dynamic>),
-      estimate: const SafeIntConverter().fromJson(json['estimate']),
-      copiedFromCardId: converter.fromJson(json['copied_from_card_id']),
       createdAt: const TimestampConverter().fromJson(json['time_created']) ?? DateTime.now(),
       updatedAt: const TimestampConverter().fromJson(json['time_updated']),
       metadata: (json['metadata'] is Map) ? Map<String, dynamic>.from(json['metadata'] as Map) : null,
@@ -204,11 +173,6 @@ class Card extends Equatable {
     int? totalComments,
     DateTime? dueDate,
     bool? isArchived,
-    List<ExternalLink>? externalLinks,
-    List<CardHint>? hints,
-    CoverImage? coverImage,
-    int? estimate,
-    String? copiedFromCardId,
     DateTime? createdAt,
     DateTime? updatedAt,
     Map<String, dynamic>? metadata,
@@ -240,11 +204,6 @@ class Card extends Equatable {
       totalComments: totalComments ?? this.totalComments,
       dueDate: dueDate ?? this.dueDate,
       isArchived: isArchived ?? this.isArchived,
-      externalLinks: externalLinks ?? this.externalLinks,
-      hints: hints ?? this.hints,
-      coverImage: coverImage ?? this.coverImage,
-      estimate: estimate ?? this.estimate,
-      copiedFromCardId: copiedFromCardId ?? this.copiedFromCardId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       metadata: metadata ?? this.metadata,
@@ -279,11 +238,6 @@ class Card extends Equatable {
     totalComments,
     dueDate,
     isArchived,
-    externalLinks,
-    hints,
-    coverImage,
-    estimate,
-    copiedFromCardId,
     createdAt,
     updatedAt,
     metadata,
@@ -292,10 +246,10 @@ class Card extends Equatable {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Card &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          title == other.title;
+          other is Card &&
+              runtimeType == other.runtimeType &&
+              id == other.id &&
+              title == other.title;
 
   @override
   int get hashCode => id.hashCode ^ title.hashCode;
@@ -347,23 +301,6 @@ class Comment extends Equatable {
     this.likeCount,
     this.likedByMe,
   });
-
-  @override
-  List<Object?> get props => [
-    id,
-    cardId,
-    content,
-    authorId,
-    authorName,
-    authorAvatar,
-    createdAt,
-    updatedAt,
-    parentCommentId,
-    replies,
-    reactions,
-    likeCount,
-    likedByMe,
-  ];
 
   Comment copyWith({
     String? id,
@@ -484,6 +421,23 @@ class Comment extends Equatable {
     );
   }
   Map<String, dynamic> toJson() => _$CommentToJson(this);
+
+  @override
+  List<Object?> get props => [
+    id,
+    cardId,
+    content,
+    authorId,
+    authorName,
+    authorAvatar,
+    createdAt,
+    updatedAt,
+    parentCommentId,
+    replies,
+    reactions,
+    likeCount,
+    likedByMe,
+  ];
 }
 
 @JsonSerializable(
