@@ -8,62 +8,47 @@ part of 'board.dart';
 
 Board _$BoardFromJson(Map<String, dynamic> json) => Board(
       id: json['id'] as String,
-      name: json['name'] as String,
+      title: json['title'] as String,
       description: json['description'] as String?,
-      teamId: json['team_id'] as String,
-      coverImageUrl: json['cover_image_url'] as String?,
-      position: (json['position'] as num?)?.toInt(),
-      isArchived: json['is_archived'] as bool? ?? false,
-      lists: (json['lists'] as List<dynamic>?)
-          ?.map((e) => BoardList.fromJson(e as Map<String, dynamic>))
+      teamId: json['team_id'] as String?,
+      projectId: json['project_id'] as String?,
+      members:
+          (json['members'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      ownerId: json['owner_id'] as String?,
+      isPublic: json['is_public'] as bool?,
+      publicSettings: json['public_settings'] == null
+          ? null
+          : PublicSettings.fromJson(
+              json['public_settings'] as Map<String, dynamic>),
+      webhookNotifications: (json['webhook_notifications'] as List<dynamic>?)
+          ?.map((e) => WebhookNotification.fromJson(e as Map<String, dynamic>))
           .toList(),
-      epics: (json['epics'] as List<dynamic>?)
-          ?.map((e) => Epic.fromJson(e as Map<String, dynamic>))
+      forms: (json['forms'] as List<dynamic>?)
+          ?.map((e) => FormModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-      createdAt: DateTime.parse(json['time_created'] as String),
-      updatedAt: const TimestampConverter().fromJson(json['time_updated']),
-      metadata: json['metadata'] as Map<String, dynamic>?,
+      vcsMapping: json['vcs_mapping'] == null
+          ? null
+          : VCSMapping.fromJson(json['vcs_mapping'] as Map<String, dynamic>),
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
+          ? null
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$BoardToJson(Board instance) => <String, dynamic>{
       'id': instance.id,
-      'name': instance.name,
+      'title': instance.title,
       'description': instance.description,
       'team_id': instance.teamId,
-      'cover_image_url': instance.coverImageUrl,
-      'position': instance.position,
-      'is_archived': instance.isArchived,
-      'lists': instance.lists,
-      'epics': instance.epics,
-      'time_created': instance.createdAt.toIso8601String(),
-      'time_updated': const TimestampConverter().toJson(instance.updatedAt),
-      'metadata': instance.metadata,
-    };
-
-BoardList _$BoardListFromJson(Map<String, dynamic> json) => BoardList(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      boardId: json['board_id'] as String,
-      position: (json['position'] as num?)?.toInt(),
-      cardIds: const SafeStringListConverter().fromJson(json['card_ids']),
-      epics: (json['epics'] as List<dynamic>?)
-          ?.map((e) => Epic.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      cards: (json['cards'] as List<dynamic>?)
-          ?.map((e) => Card.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      createdAt: DateTime.parse(json['time_created'] as String),
-      updatedAt: const TimestampConverter().fromJson(json['time_updated']),
-    );
-
-Map<String, dynamic> _$BoardListToJson(BoardList instance) => <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'board_id': instance.boardId,
-      'position': instance.position,
-      'card_ids': const SafeStringListConverter().toJson(instance.cardIds),
-      'epics': instance.epics,
-      'cards': instance.cards,
-      'time_created': instance.createdAt.toIso8601String(),
-      'time_updated': const TimestampConverter().toJson(instance.updatedAt),
+      'project_id': instance.projectId,
+      'members': instance.members,
+      'owner_id': instance.ownerId,
+      'is_public': instance.isPublic,
+      'public_settings': instance.publicSettings?.toJson(),
+      'webhook_notifications':
+          instance.webhookNotifications?.map((e) => e.toJson()).toList(),
+      'forms': instance.forms?.map((e) => e.toJson()).toList(),
+      'vcs_mapping': instance.vcsMapping?.toJson(),
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
     };
